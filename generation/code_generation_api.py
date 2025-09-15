@@ -10,21 +10,6 @@ import time
 
 MAX_RETRIES = 5  # 最大重试次数
 
-
-# 初始化 OpenAI 客户端
-# 百炼大模型 API 初始化
-client = OpenAI(
-    # api_key=os.getenv("DASHSCOPE_API_KEY"),  # 替换为你的 API Key
-    api_key="sk-27c492640d20407b939241e751d5ad89",
-    base_url="https://dashscope.aliyuncs.com/compatible-mode/v1",
-)
-
-# DeepSeek API 客户端初始化
-# client = OpenAI(
-#     api_key="sk-56c63e81e18b4bb3870593ded20df59f",
-#     base_url="https://api.deepseek.com",
-# )
-
 # 处理每条记录并调用 API
 def api_infer(input_path, output_path, recovery_file, model_name, num_completion=1, max_samples=None, output_fields=None,
                  continue_from_error=False, temperature=0.8, top_p=0.95, max_tokens=2048, save_every=1000, random_seed=None, debug=False):
