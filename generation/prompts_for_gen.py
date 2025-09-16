@@ -1,5 +1,6 @@
-# v5.1 版本的 prompt
+# prompt of v5.1
 SYSTEM_PROMPT_V5_1 = """You are an experienced programmer who is skilled at creating high-quality program editing tasks and providing precise solutions."""
+# First round: generate pre-edit code and edit instructions
 USER_PROMPT_V5_1_ROUND_1 = """
 Please gain inspiration from the following two code snippets and design a Python program. Then, create a task to edit the program. \
 Please output the Python program first, and then output the editing task in both descriptive and lazy forms. \
@@ -45,7 +46,7 @@ but the description should be clear to understand by humans.
 
 """.strip()
 
-# 第二轮生成修改后代码
+# Second round: generate the post-edit code
 USER_PROMPT_V5_1_ROUND_2 = """
 Is the program you designed in section [Program Before Edit] reasonable? \
 If it is reasonable, Please provide the revised standard code based on the task you designed, in the section [Program After Edit], without any explanation;\

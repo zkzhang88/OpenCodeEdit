@@ -12,6 +12,7 @@ def filter_singleline_data(input_file, output_file, field_names):
             data = json.loads(line)
             for field_n in field_names:
                 # if field_n in data and ('\n' not in data[field_n] or data[field_n].strip().endswith('.py')):
+                # If the field content does not contain a newline character, or contains special characters, or starts with $, then delete this data
                 if field_n in data and ('\n' not in data[field_n] or '\u2500' in data[field_n] or data[field_n].strip().startswith('$')):
                     delete_flag = True
                     break
@@ -23,7 +24,7 @@ def purify_instruct_and_code(input_file, output_file):
     extension = '.jsonl'
     counter = 0
 
-    # 生成一个临时文件名，检查临时文件名是否冲突
+    # Generate a temporary file name, check for conflicts
     while True:
         purify_temp_file = f"{base_name}_{counter}{extension}"
         if not os.path.exists(purify_temp_file):
@@ -33,30 +34,30 @@ def purify_instruct_and_code(input_file, output_file):
     # Separate instructions and code from model response
     separate_instruct(input_file=input_file, output_file=purify_temp_file)
 
-    # 生成第二个临时文件名，检查临时文件名是否冲突
+    # Generate a second temporary file name, check for conflicts
     while True:
         purify_temp_file_2 = f"{base_name}_{counter}{extension}"
         if not os.path.exists(purify_temp_file_2):
             break
         counter += 1
 
-    # 过滤掉单行数据
+    # Filter out single-line data
     filter_singleline_data(input_file=purify_temp_file, output_file=purify_temp_file_2, field_names=['code_before', 'code_after'])
 
-    # 生成第三个临时文件名，检查临时文件名是否冲突
+    # Generate a third temporary file name, check for conflicts
     while True:
         purify_temp_file_3 = f"{base_name}_{counter}{extension}"
         if not os.path.exists(purify_temp_file_3):
             break
         counter += 1
 
-    # 净化代码部分
+    # Purify code part
     purify_code_from_jsonl(input_file=purify_temp_file_2, output_file=purify_temp_file_3, purify_fields=["code_before", "code_after"], keep_language_mark=False)
 
-    # 净化指令部分
+    # Purify instruction part
     purify_instructions(input_file=purify_temp_file_3, output_file=output_file, purify_fields=["instruct_descriptive", "instruct_lazy"])
 
-    # 删除临时文件
+    # Delete temporary files
     os.remove(purify_temp_file)
     os.remove(purify_temp_file_2)
     os.remove(purify_temp_file_3)

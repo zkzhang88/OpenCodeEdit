@@ -47,11 +47,11 @@ def sample_and_mix(input_files, output_file, instr_types, model_names, ratios, t
     if not abs(sum(ratios) - 1.0) < 1e-6:
         raise ValueError("Ratios must sum to 1.")
 
-    # 采用最大剩余法分配样本数，避免舍入误差
+    # Use the largest remainder method to allocate sample counts and avoid rounding errors
     raw_counts = [r * total_samples for r in ratios]
     samples_per_file = [int(count) for count in raw_counts]
     remainder = total_samples - sum(samples_per_file)
-    # 按照小数部分从大到小分配剩余的样本
+    # Allocate remaining samples according to the fractional part in descending order
     if remainder > 0:
         fractional_parts = [(i, raw_counts[i] - samples_per_file[i]) for i in range(len(raw_counts))]
         fractional_parts.sort(key=lambda x: x[1], reverse=True)
@@ -68,7 +68,7 @@ def sample_and_mix(input_files, output_file, instr_types, model_names, ratios, t
 
         constructed_data.extend(construct_data(sampled_lines, instr_type=instr_type, model_name=model_name))
 
-    # 统一处理 commit 字段，确保为字符串
+    # Unify the commit field to ensure it is a string
     for item in constructed_data:
         commit = item.get("commit")
         if isinstance(commit, list):
@@ -83,18 +83,18 @@ def sample_and_mix(input_files, output_file, instr_types, model_names, ratios, t
             f.write(json.dumps(item) + '\n')
 
 if __name__ == "__main__":
-    # 示例用法
+    # Example usage
     input_files = ['generated_code_and_instruct/purified_instruct_v5_1_code_extend_qwen3.jsonl',
                    'generated_code_and_instruct/purified_instruct_v5_1_code_extend_qwen3.jsonl',
                    'generated_code_and_instruct/purified_instruct_v5_1_code_extend_ds.jsonl',
                    'generated_code_and_instruct/purified_instruct_v5_1_code_extend_ds.jsonl'
                    ]
-    ratios = [0.25, 0.25, 0.25, 0.25]  # 比例之和应为1
+    ratios = [0.25, 0.25, 0.25, 0.25]  # The sum of ratios should be 1
     instr_types = ['descriptive', 'lazy', 'descriptive', 'lazy']
     model_names = ['qwen3', 'qwen3', 'ds', 'ds']
     output_file = 'generated_old_code/purified_instruct_v5_1_mix_test.jsonl'
-    total_samples = 60000  # 指定输出样本总数
-    random_seed = 42  # 设置随机种子以确保可重复性
+    total_samples = 60000  # Specify the total number of output samples
+    random_seed = 42  # Set random seed for reproducibility
 
     sample_and_mix(
         input_files=input_files,

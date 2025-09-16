@@ -24,54 +24,49 @@ def create_prompt(commit_input_path, oneshot_input_path, prompt_version, prompt_
     
     system_prompt, user_prompt_template = get_prompts(prompt_version)
 
-    # 从 oneshot_input_path 中读取数据
+    # Read data from oneshot_input_path
     with open(oneshot_input_path, 'r', encoding='utf-8') as oneshot_file:
         oneshot_lines = oneshot_file.readlines()
 
-    # 随机种子
+    # Random seed
     random.seed(random_seed)
 
-    skipped_records = 0  # 初始化跳过记录计数器
+    skipped_records = 0  # Initialize skipped records counter
 
     def sample_code_snippet(code):
         """
-        从 code 中随机抽取一段代码片段，长度在 min_snippet_lines 和 max_snippet_lines 之间。
+        Randomly sample a code snippet from code, with length between min_snippet_lines and max_snippet_lines.
         """
-
         lines = code.splitlines()
         total_length = len(lines)
-
         if total_length < min_snippet_lines:
             raise ValueError(f"Code has fewer lines than the minimum snippet length {min_snippet_lines}.")
-
         snippet_length = random.randint(min_snippet_lines, min(max_snippet_lines, total_length))
         start_line = random.randint(0, total_length - snippet_length)
-        
         snippet = '\n'.join(lines[start_line:start_line+snippet_length])
-        
         return snippet
         
     with open(prompt_output_path, 'w', encoding='utf-8') as output_file:
-        # 从 commit_input_path 中随机抽取代码片段
+    # Randomly sample code snippets from commit_input_path
         with open(commit_input_path, 'r', encoding='utf-8') as commit_file:
             commit_lines = commit_file.readlines()
-            created_prompt_num = 0  # 已创建的提示数量
+            created_prompt_num = 0  # Number of prompts created
             while created_prompt_num < sample_num:
-                # 跳过标志
+                # Skip flag
                 skip_flag = False
-                # 随机选取两行 commit_lines
+                # Randomly select two lines from commit_lines
                 selected_commit_lines = random.sample(commit_lines, 2)
                 commit_contents = [json.loads(l) for l in selected_commit_lines]
 
-                # 检查内容是否为空
+                # Check if content is empty
                 for commit_data in commit_contents:
-                    # 如果 old_code、new_code 或 commit_num 为空，则跳过该记录
+                    # If old_code, new_code, or commit_num is empty, skip this record
                     if not commit_data.get('old_contents', '') or not commit_data.get('new_contents', '') or not commit_data.get('commit', ''):
                         print(f"\033[91mWarning: Missing old/new code or commit number. Skipping this record.\033[0m")
                         skip_flag = True
 
                 if skip_flag:
-                    # 有内容为空，跳过
+                    # Skip if any content is empty
                     skipped_records += 1
                     continue
 
@@ -81,15 +76,15 @@ def create_prompt(commit_input_path, oneshot_input_path, prompt_version, prompt_
                 try:
                     code_snippet = [sample_code_snippet(commit_data['old_contents']) for commit_data in commit_contents] 
                 except ValueError as e:
-                    # 如果代码行数少于 min_snippet_lines，跳过该记录
+                    # If code lines are fewer than min_snippet_lines, skip this record
                     print(f"\033[91mWarning: {e}. Skipping this record.\033[0m")
                     skipped_records += 1
                     continue
 
-                # 随机选取一条 one shot 数据
+                # Randomly select one one-shot data
                 oneshot_data = json.loads(random.choice(oneshot_lines))
 
-                # 填充 user_prompt_template 中的示例字段
+                # Fill example fields in user_prompt_template
                 if prompt_version.startswith('v5'):
                     user_prompt = [user_prompt_template[0].format(
                         code_snippet_1=code_snippet[0],
@@ -114,18 +109,18 @@ def create_prompt(commit_input_path, oneshot_input_path, prompt_version, prompt_
 
                 created_prompt_num += 1
 
-    print(f"Total skipped records: {skipped_records}")  # 打印跳过记录的总数
+    print(f"Total skipped records: {skipped_records}")  # Print total number of skipped records
 
 
 def create_prompt_rewrite_commit(commit_input_path, oneshot_input_path, prompt_version, prompt_output_path, shuffle=False, random_seed=None):
     system_prompt, user_prompt_template = get_prompts(prompt_version)
 
-    skipped_records = 0  # 初始化跳过记录计数器
+    skipped_records = 0  # Initialize skipped records counter
 
-    # 新增：用于收集所有输出数据
+    # Used to collect all output data
     output_data = []
 
-    # 从 oneshot_input_path 中读取数据
+    # Read data from oneshot_input_path
     with open(oneshot_input_path, 'r', encoding='utf-8') as oneshot_file:
         oneshot_lines = oneshot_file.readlines()
 
@@ -137,7 +132,7 @@ def create_prompt_rewrite_commit(commit_input_path, oneshot_input_path, prompt_v
             new_code = data.get('new_contents', '')
             commit_message = data.get('message', '')
 
-            # 如果任意一个变量为空，则跳过该记录
+            # If any variable is empty, skip this record
             if not old_code:
                 print(f"\033[91mWarning: Old code is empty. Skipping this record.\nCommit number: {commit_num}\033[0m")
                 skipped_records += 1
@@ -151,11 +146,11 @@ def create_prompt_rewrite_commit(commit_input_path, oneshot_input_path, prompt_v
                 skipped_records += 1
                 continue
 
-            # 随机选取一条 one shot 数据
+            # Randomly select one one-shot data
             oneshot_data = json.loads(random.choice(oneshot_lines))
 
             if prompt_version.startswith('v5.9'):
-                # 生成 diff
+                # Generate diff
                 diff = difflib.unified_diff(old_code.splitlines(), new_code.splitlines(), lineterm='')
                 unified_diff = '\n'.join(diff)
                 
@@ -178,19 +173,19 @@ def create_prompt_rewrite_commit(commit_input_path, oneshot_input_path, prompt_v
                 "commit_message": commit_message
             }
 
-            # 修改：收集到 output_data
+            # Modified: collect to output_data
             output_data.append(json.dumps(filled_prompt))
 
-    # shuffle 功能
+    # Shuffle feature
     if shuffle:
         random.shuffle(output_data)
 
-    # 写入文件
+    # Write to file
     with open(prompt_output_path, 'w', encoding='utf-8') as output_file:
         for item in output_data:
             output_file.write(item + '\n')
 
-    print(f"Total skipped records: {skipped_records}")  # 打印跳过记录的总数
+    print(f"Total skipped records: {skipped_records}")  # Print total number of skipped records
 
 
 if __name__ == "__main__":
