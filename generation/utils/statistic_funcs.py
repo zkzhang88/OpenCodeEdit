@@ -18,9 +18,9 @@ import pandas as pd
 from collections import Counter
 import plotly.express as px
 
-from load_instruct_from_file import load_instructions_from_jsonl
-from code_splitter import edit_instruction_splitter
-from plot_and_save import write_statistic_csv
+from utils.load_instruct_from_file import load_instructions_from_jsonl
+from utils.code_splitter import edit_instruction_splitter
+from utils.plot_and_save import write_statistic_csv
 
 log = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, format='[%(asctime)s] %(levelname)s: %(message)s')
@@ -155,32 +155,6 @@ def hdp_topic_analysis(jsonl_path, field_name, data_format, refit=False, debug=F
     # 获取这些主题的描述
     topic_dict = dict(hdp_model.print_topics(num_topics=num_topics, num_words=10))
     # top_20 = {tid: topic_dict[tid] for tid in topic_ids}
-
-    # # 输出主题数量
-    # log.info(f"Number of topics found: {num_topics}")
-    # # 输出前20个主题
-    # for i, (tid, topic_str) in enumerate(top_20.items(), start=1):
-    #     log.info(f"Topic #{i} (ID {tid}): {topic_str}")
-    
-    # # 保存主题信息到CSV文件
-    # hdp_topic_csv = kwargs.get('csv_path', None)
-    # if hdp_topic_csv:
-    #     write_statistic_csv(
-    #         hdp_topic_csv,
-    #         ['file', 'num_topics', 'topics'],
-    #         [base_name, num_topics, "; ".join(top_20.values())])
-    # 词云可视化：前k个主题的关键词
-    # from wordcloud import WordCloud
-    # top_k = kwargs.get('top_k', 5)
-    # os.makedirs(figure_dir, exist_ok=True)
-    # for i, tid in enumerate(topic_ids[:top_k]):
-    #     topic_words = topic_dict[tid]
-    #     # 提取关键词（假设格式为 '0.01*"token1" + 0.02*"token2" ...'）
-    #     words = " ".join([w.split('*')[1].replace('"', '') for w in topic_words.split(' + ')])
-    #     wc = WordCloud(width=800, height=400, background_color='white').generate(words)
-    #     wc_path = os.path.join(figure_dir, f"{base_name}_hdp_topic_{tid}_wordcloud.png")
-    #     wc.to_file(wc_path)
-    #     log.info(f"HDP topic {tid} wordcloud saved to: {wc_path}")
 
     # 绘制主题分布柱状图（最多20个，按数量降序）
     figure_dir = kwargs.get('figure_dir', None)
