@@ -10,6 +10,27 @@ logging.getLogger('gensim').setLevel(logging.WARNING)
 
 
 def dt_filtering(jsonl_path, field_name, data_format, random_seed=None, filter_settings=None):
+    """
+    Filters and processes data from a JSONL file using diff-based and topic-based criteria.
+    This function performs two main filtering steps:
+    1. Diff Filtering: Filters data samples based on the number of modified lines and hunks.
+    2. HDP Topic Filtering: Further filters the diff-filtered data using Hierarchical Dirichlet Process (HDP) topic analysis.
+    Args:
+        jsonl_path (str): Path to the input JSONL file containing data samples.
+        field_name (str or list): Field name(s) to extract instruction content.
+            - For 'sharegpt': a single field specifying the conversation list.
+            - For general format: one or two field names to concatenate.
+        data_format (str): The construction format of the input dataset ("sharegpt" or "general").
+        random_seed (int, optional): Seed for random operations to ensure reproducibility. Defaults to None.
+        filter_settings (dict, optional): Dictionary of filtering parameters. Supported keys:
+            - "max_modify_lines" (int): Maximum number of modified lines allowed per sample (default: 70).
+            - "max_hunk_num" (int): Maximum number of hunks allowed per sample (default: 7).
+            - "max_samples_total" (int): Maximum total number of samples after filtering (default: 10000).
+            - "refit" (bool): Whether to refit the HDP topic model (default: False).
+    Returns:
+        None: The function writes filtered data to output files in the "filtered" directory.
+    """
+
 
     base_name = os.path.splitext(os.path.basename(jsonl_path))[0]
     abs_jsonl_path = os.path.abspath(jsonl_path)
