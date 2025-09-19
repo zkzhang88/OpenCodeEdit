@@ -46,8 +46,8 @@ def dt_filtering(jsonl_path, field_name, data_format, random_seed=None, filter_s
     data_list = read_jsonl(jsonl_path)
     filtered_data = filter_by_modify_lines(data_list, max_modify_lines=max_modify_lines, max_hunk_num=max_hunk_num)
     output_filename = f"{base_name}_diff_filtered.jsonl"
-    instruct_gen_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    output_dir = os.path.join(instruct_gen_dir, "filtered")
+    instruct_gen_dir = os.path.dirname(os.path.abspath(__file__))
+    output_dir = os.path.join(instruct_gen_dir, "data", "filtered")
     os.makedirs(output_dir, exist_ok=True)
     diff_output_path = os.path.join(output_dir, output_filename)
     write_jsonl(filtered_data, diff_output_path)
