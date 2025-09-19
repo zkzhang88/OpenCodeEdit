@@ -84,7 +84,12 @@ def sample_and_mix(input_files, output_file, instr_types, model_names, ratios, t
             f.write(json.dumps(item) + '\n')
 
 if __name__ == "__main__":
-    with open("mix_config.yaml", "r", encoding="utf-8") as f:
+    import argparse
+    parser = argparse.ArgumentParser(description="Sample and mix data from multiple JSONL files.")
+    parser.add_argument("--config", type=str, default="mix_config.yaml", help="Path to the YAML configuration file.")
+    args = parser.parse_args()
+
+    with open(args.config, "r", encoding="utf-8") as f:
         config = yaml.safe_load(f)
 
     sample_and_mix(
