@@ -20,7 +20,6 @@ import plotly.express as px
 
 from utils.load_instruct_from_file import load_instructions_from_jsonl
 from utils.code_splitter import edit_instruction_splitter
-from utils.plot_and_save import write_statistic_csv
 
 log = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, format='[%(asctime)s] %(levelname)s: %(message)s')
