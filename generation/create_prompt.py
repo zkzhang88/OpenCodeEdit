@@ -191,16 +191,16 @@ def create_prompt_rewrite_commit(commit_input_path, oneshot_input_path, prompt_v
 if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(description="Create prompts for code generation or commit rewriting.")
-    parser.add_argument('--prompt_type', type=str, default='rewrite_commit', help="Type of prompt to create: 'code_extend' or 'rewrite_commit'")
+    parser.add_argument('--prompt_type', type=str, default='code_extend', help="Type of prompt to create: 'code_extend' or 'rewrite_commit'")
     args = parser.parse_args()
 
     if args.prompt_type == 'code_extend':
         # Create prompts for code extension
         create_prompt(
             commit_input_path='data/commitpackft_python_cleaned.jsonl',
-            oneshot_input_path='create_prompt/few-shot/1-shot-prompt_final_chose.jsonl',
+            oneshot_input_path='few-shot/1-shot-prompt_final_chose.jsonl',
             prompt_version='v5.1',
-            prompt_output_path='data/prompts/prompt_v5_1.jsonl',
+            prompt_output_path='data/prompt_for_syn.jsonl',
             min_snippet_lines=5,
             max_snippet_lines=15,
             sample_num=100000,
@@ -210,8 +210,8 @@ if __name__ == "__main__":
         # Create prompts for commit rewriting
         create_prompt_rewrite_commit(
             commit_input_path='data/commitpackft_python_cleaned.jsonl',
-            oneshot_input_path='create_prompt/few-shot/1-shot-prompt_final_chose.jsonl',
+            oneshot_input_path='few-shot/1-shot-prompt_final_chose.jsonl',
             prompt_version='v5.9',
-            prompt_output_path='data/prompts/prompt_rewrite_commit.jsonl',
+            prompt_output_path='data/prompt_rewrite_commit.jsonl',
             random_seed=42
         )
