@@ -4,7 +4,22 @@ To run the OpenCodeEdit, you can follow the guideline below:
 
 ## Requirements
 
-Before starting, make sure that you have installed the following packages and their specific versions.
+Before running the pipeline, make sure that you have installed the following packages and their specific versions.
+```
+gensim==4.3.3
+joblib==1.4.2
+matplotlib==3.10.6
+nltk==3.9.1
+numpy==1.26.4
+openai==1.59.6
+pandas==2.2.3
+plotly==6.3.0
+Pygments==2.19.2
+PyYAML==6.0.2
+scikit_learn==1.6.1
+spacy==3.8.7
+tqdm==4.67.1
+```
 
 
 ## Data Generation
