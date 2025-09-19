@@ -1,9 +1,22 @@
-jsonl_path: "generation/data/commitpackft_python_cleaned.jsonl"  # 数据集路径
-field_name: "code"  # 需要处理的字段名
-data_format: "plain"  # 数据格式，可根据实际情况调整
-random_seed: 42  # 随机种子，可选
-filter_settings:   # 过滤相关设置，可选
+# Path to the input JSONL file containing data samples
+jsonl_path: "data/ocedata_mix_descriptive.jsonl"  
+
+# List of field names to extract instruction content (do not change this if unsure)
+field_name: ["code_before_purify", "instruct_purify"]  
+
+# The construction format of the input dataset ("sharegpt" or "general") (do not change this if unsure)
+data_format: "general"
+
+# Seed for random operations to ensure reproducibility
+random_seed: 42  
+
+# Dictionary of filtering parameters
+filter_settings:  
+  # Maximum number of modified lines allowed per sample
   max_modify_lines: 70
+  # Maximum number of hunks allowed per sample
   max_hunk_num: 7
+  # Maximum total number of samples after filtering
   max_samples_total: 10000
+  # Whether to refit the HDP topic model
   refit: false
