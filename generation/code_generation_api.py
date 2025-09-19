@@ -214,6 +214,8 @@ if __name__ == "__main__":
     parser.add_argument("--input_file", type=str, required=True, help="Input file containing structured prompts")
     parser.add_argument("--output_file", type=str, required=True, help="Output file to save generated instructions")
     parser.add_argument("--recovery_file", type=str, required=True, help="File for recovering from error")
+    parser.add_argument("--model_name", type=str, required=True, choices=["qwen3-32b", "deepseek-chat"],
+                        help="Model name: 'qwen3-32b' or 'deepseek-chat'")
     parser.add_argument("--continue_from_error", action='store_true', help="Flag to continue from error")
     parser.add_argument("--temperature", type=float, default=0.8, help="Temperature for sampling")
     parser.add_argument("--top_p", type=float, default=0.95, help="Top-p for sampling")
@@ -226,8 +228,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    # model_name = "qwen2.5-coder-32b-instruct"
-    model_name = "deepseek-chat"
+    model_name = args.model_name
 
     # Call the function
     api_infer(
