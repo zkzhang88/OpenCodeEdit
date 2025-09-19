@@ -24,6 +24,10 @@ def purify_instruct_and_code(input_file, output_file):
     extension = '.jsonl'
     counter = 0
 
+    output_dir = os.path.dirname(os.path.abspath(output_file))
+    if output_dir and not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+
     # Generate a temporary file name, check for conflicts
     while True:
         purify_temp_file = f"{base_name}_{counter}{extension}"

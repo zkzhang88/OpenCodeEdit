@@ -1,5 +1,6 @@
 import json
 import random
+import os
 from typing import Optional
 
 SYSTEM_PROMPT = "You are a code editor. You will be provided the original code snippet and an instruction that specifies " \
@@ -11,6 +12,10 @@ def generate_prompt(input_files, output_file, prompt_format='share_gpt', random_
 
     if random_seed is not None:
         random.seed(random_seed)  # Set the random seed for reproducibility
+
+    output_dir = os.path.dirname(os.path.abspath(output_file))
+    if output_dir and not os.path.exists(output_dir):
+        os.makedirs(output_dir)
         
     with open(input_files, 'r', encoding='utf-8') as f:
         lines = f.readlines()
