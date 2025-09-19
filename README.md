@@ -43,6 +43,12 @@ We generate each component of the edit triplet through a two-round dialogue. An 
 
 ![An example of the two-round dialogue](images/dialogue_example.png)
 
+The filtered fine-tune dataset OCEDataFT and unfiltered version OCEData is located in  `/datasets` directory. The datasets are constructed as JSONL files in ShareGPT format.
+
+## Downstream Fine-tuning
+
+In this work, we use LLaMA-Factory for downstream fine-tuning. For any usage, please refer to https://github.com/hiyouga/LLaMA-Factory.
+
 ## Evaluation
 
 ### Benchmark
