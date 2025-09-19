@@ -58,7 +58,7 @@ def load_instructions_from_jsonl(file_path, field_name, data_format):
             elif len(field_name) == 2:
                 if field_name[0] not in data or field_name[1] not in data:
                     raise KeyError(f"字段 {field_name} 中的某个字段不存在于数据: {data}")
-                instructions.append(data[field_name[0]] + "\n" + data[field_name[1]])
+                instructions.append(f"## Code Before:\n{data[field_name[0]]}\n## Instruction:\n{data[field_name[1]]}\n## Code After:\n")
                 commits.append(data["commit"])
             elif field_name[0] in data:
                 instructions.append(data[field_name[0]])
