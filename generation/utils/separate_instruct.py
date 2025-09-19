@@ -94,21 +94,7 @@ def separate_instruct(input_file, output_file, check_missing=False):
                 "instruct_descriptive": descriptive_content,
                 "instruct_lazy": lazy_content
             }
-
-            # 由于输入的jsonl文件中已经记录了 code before ，所以不需要再从 user prompt 中提取
-            # # Extracting the code before the change from user prompt
-            # code_before_start = user.find('Old version of the code:\n```') + len('Old version of the code:\n```')
-            # code_before_end = user.find('```\n\nNew version of the code:')
-            # code_before = user[code_before_start:code_before_end].strip() if code_before_start != -1 and code_before_end != -1 else ""
-
-            # separated_data["code_before"] = code_before
             
             outfile.write(json.dumps(separated_data) + '\n')
 
     print(f"Seperation finished, with {count_missing} missing instructs.")
-
-
-if "__main__" == __name__:
-    input_file = 'generated_old_code/v5_1/gen_instruct_v5_1_code_extend_qwen3.jsonl'
-    output_file = 'generated_old_code/v5_1/seperated_instruct_v5_1_code_extend_qwen3.jsonl'
-    separate_instruct(input_file, output_file, check_missing=False)
