@@ -1,6 +1,6 @@
-# OpenCodeEdit: Synthesizing Instruction-Tuning Data for Code Editing with Open-Source LLMs
+# OpenCodeEdit
 
-OpenCodeEdit is a fully open-source data synthesis pipeline for instruction tuning LLMs on code editing, which is described in the paper "OpenCodeEdit: Synthesizing Instruction-Tuning Data for Code Editing with Open-Source LLMs". 
+OpenCodeEdit is a fully open-source data synthesis pipeline for instruction tuning LLMs on code editing.
 
 ## Data Synthesis Pipline
 
