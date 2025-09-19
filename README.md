@@ -18,6 +18,8 @@ To better reflect real-world editing scenarios, our generated dataset includes b
 
 ![Overview of OpenCodeEdit.](images/opencodeedit_pipeline.png)
 
+The code for this pipeline is located in `/generation` directory. For more details, refer to [generation/README](./generation/README.md)
+
 ## OCEData and OCEDataFT
 
 The dataset constructed by OpenCodeEdit is an edit triplet composed by three parts:
