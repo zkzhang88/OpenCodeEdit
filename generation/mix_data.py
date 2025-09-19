@@ -1,5 +1,6 @@
 import json
 import random
+import yaml
 
 def construct_data(input_lines, instr_type, model_name=None):
     constructed_data = []
@@ -83,25 +84,15 @@ def sample_and_mix(input_files, output_file, instr_types, model_names, ratios, t
             f.write(json.dumps(item) + '\n')
 
 if __name__ == "__main__":
-    # Example usage
-    input_files = ['generated_code_and_instruct/purified_instruct_v5_1_code_extend_qwen3.jsonl',
-                   'generated_code_and_instruct/purified_instruct_v5_1_code_extend_qwen3.jsonl',
-                   'generated_code_and_instruct/purified_instruct_v5_1_code_extend_ds.jsonl',
-                   'generated_code_and_instruct/purified_instruct_v5_1_code_extend_ds.jsonl'
-                   ]
-    ratios = [0.25, 0.25, 0.25, 0.25]  # The sum of ratios should be 1
-    instr_types = ['descriptive', 'lazy', 'descriptive', 'lazy']
-    model_names = ['qwen3', 'qwen3', 'ds', 'ds']
-    output_file = 'generated_old_code/purified_instruct_v5_1_mix_test.jsonl'
-    total_samples = 60000  # Specify the total number of output samples
-    random_seed = 42  # Set random seed for reproducibility
+    with open("mix_config.yaml", "r", encoding="utf-8") as f:
+        config = yaml.safe_load(f)
 
     sample_and_mix(
-        input_files=input_files,
-        output_file=output_file,
-        ratios=ratios,
-        instr_types=instr_types,
-        model_names=model_names,
-        total_samples=total_samples,
-        random_seed=random_seed
+        input_files=config["input_files"],
+        output_file=config["output_file"],
+        ratios=config["ratios"],
+        instr_types=config["instr_types"],
+        model_names=config["model_names"],
+        total_samples=config["total_samples"],
+        random_seed=config.get("random_seed", None)
     )
