@@ -56,9 +56,11 @@ We adopt [CanItEdit](https://github.com/nuprl/canitedit) as our benchmark for ev
 
 ### Metric
 we evaluate model performance using the pass@1 metric, which measures the probability that a single generated solution passes all predefined test cases. Formally, for a set of model-generated answers, pass@1 is defined as:
+
 $$
-\mathrm{pass@1} = \frac{1}{N}\sum_{i=1}^{N} \mathbf{1}\left [ \mathrm{Solution}  \; i \; \mathrm{passes \; all \; tests}  \right ]
+\mathrm{pass@1} = \frac{1}{N}\sum_{i=1}^{N} \mathbf{1}\left [ \mathrm{Solution}  \ i \ \mathrm{passes \ all \ tests}  \right ]
 $$
+
 where $N$ denotes the number of generated solutions and $\mathbf{1}[\cdot]$ is the indicator function. A higher pass@1 value indicates a greater success rate, thereby reflecting stronger instruction-following and code editing performance.
 
 We use the following settings for inference in our evaluation: 2048 maximum new tokens, temperature of 0.2, and top-p of 0.95. We sample 20 completions for each problem, and calculate pass@1.
