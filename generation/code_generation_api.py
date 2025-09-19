@@ -10,6 +10,9 @@ import time
 
 MAX_RETRIES = 5  # Maximum number of retries
 
+QWEN_API_KEY = "sk-xxxx"  # Replace with your API Key from https://bailian.console.aliyun.com/?spm=a2c4g.11186623.0.0.48eb2bdbvjKMhD&tab=model#/api-key
+DEEPSEEK_API_KEY = "sk-xxxx"  # Replace with your API Key from https://platform.deepseek.com/
+
  # Process each record and call the API
 def api_infer(input_path, output_path, recovery_file, model_name, num_completion=1, max_samples=None, output_fields=None,
                  continue_from_error=False, temperature=0.8, top_p=0.95, max_tokens=2048, save_every=1000, random_seed=None, debug=False):
@@ -38,13 +41,13 @@ def api_infer(input_path, output_path, recovery_file, model_name, num_completion
 
     if model_name == "qwen3-32b":
         client = OpenAI(
-            api_key="sk-xxxx", # Replace with your API Key
+            api_key=QWEN_API_KEY,
             base_url="https://dashscope.aliyuncs.com/compatible-mode/v1",
         )
         extra_body = {"enable_thinking": False}  # Disable thinking mode
     elif model_name == "deepseek-chat":
         client = OpenAI(
-            api_key="sk-xxxx", # Replace with your API Key
+            api_key=DEEPSEEK_API_KEY,
             base_url="https://api.deepseek.com",
         )
         extra_body = {}
