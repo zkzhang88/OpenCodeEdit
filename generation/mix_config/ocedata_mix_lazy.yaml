@@ -1,0 +1,9 @@
+input_files:
+  - data/triplets_qwen3.jsonl
+  - data/triplets_ds.jsonl
+ratios: [0.5, 0.5]
+instr_types: [lazy, lazy]
+model_names: [qwen3, ds]
+output_file: data/ocedata_mix_lazy.jsonl
+total_samples: 60000
+random_seed: 42

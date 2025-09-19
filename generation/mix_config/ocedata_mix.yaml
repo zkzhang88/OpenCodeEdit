@@ -1,11 +1,11 @@
 input_files:
-  - data/purified_qwen3.jsonl
-  - data/purified_qwen3.jsonl
-  - data/purified_ds.jsonl
-  - data/purified_ds.jsonl
+  - data/triplets_qwen3.jsonl
+  - data/triplets_qwen3.jsonl
+  - data/triplets_ds.jsonl
+  - data/triplets_ds.jsonl
 ratios: [0.25, 0.25, 0.25, 0.25]
 instr_types: [descriptive, lazy, descriptive, lazy]
 model_names: [qwen3, qwen3, ds, ds]
-output_file: data/mix.jsonl
+output_file: data/ocedata_mix.jsonl
 total_samples: 60000
 random_seed: 42
