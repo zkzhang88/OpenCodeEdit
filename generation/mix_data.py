@@ -3,6 +3,18 @@ import random
 import yaml
 
 def construct_data(input_lines, instr_type, model_name=None):
+    """
+    Constructs a list of data entries from input JSONL lines based on instruction type and model name.
+    Each entry contains commit info, code snippets, purified instructions, and type labels.
+
+    Args:
+        input_lines (list[str]): List of JSONL lines to process.
+        instr_type (str): Type of instruction ('descriptive' or 'lazy').
+        model_name (str, optional): Name of the model to prefix the instruction type. Defaults to None.
+
+    Returns:
+        list[dict]: List of constructed data entries for downstream tasks.
+    """
     constructed_data = []
     for line in input_lines:
         data = json.loads(line)
@@ -40,6 +52,23 @@ def construct_data(input_lines, instr_type, model_name=None):
     return constructed_data
 
 def sample_and_mix(input_files, output_file, instr_types, model_names, ratios, total_samples, random_seed=None):
+    """
+    Samples and mixes data from multiple JSONL files according to specified ratios and configuration.
+    Uses the largest remainder method for sample allocation, constructs unified data entries,
+    and writes the mixed dataset to an output file in JSONL format.
+
+    Args:
+        input_files (list[str]): List of input JSONL file paths.
+        output_file (str): Path to the output JSONL file.
+        instr_types (list[str]): List of instruction types for each input file.
+        model_names (list[str]): List of model names for each input file.
+        ratios (list[float]): List of sampling ratios for each input file (must sum to 1).
+        total_samples (int): Total number of samples to generate.
+        random_seed (int, optional): Random seed for reproducibility. Defaults to None.
+
+    Raises:
+        ValueError: If input configuration is invalid or not enough data to sample.
+    """
     if random_seed is not None:
         random.seed(random_seed)  # Set the random seed for reproducibility
 
