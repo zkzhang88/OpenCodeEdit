@@ -29,40 +29,40 @@ def load_instructions_from_jsonl(file_path, field_name, data_format):
     instructions = []
     commits = []
 
-    # 确保 field_name 是列表
+    # Ensure field_name is a list
     if isinstance(field_name, str):
         field_name = [field_name]
 
     with open(file_path, 'r', encoding='utf-8') as f:
         for line in f:
             data = json.loads(line)
-            # 检查 commit 字段
+            # Check commit field
             if "commit" not in data:
-                raise KeyError(f"'commit' 字段不存在于数据: {data}")
+                raise KeyError(f"'commit' field does not exist in data: {data}")
             
-            # ShareGPT 格式处理
+            # ShareGPT format processing
             if data_format == "sharegpt":
                 if field_name[0] not in data:
-                    raise KeyError(f"{field_name[0]} 字段不存在于数据: {data}")
+                    raise KeyError(f"Field {field_name[0]} does not exist in data: {data}")
                 user_messages = [
                     turn["content"] for turn in data[field_name[0]]
                     if turn.get("role") == "user"
                 ]
                 if not user_messages:
-                    raise ValueError(f"未找到 role='user' 的对话内容: {data}")
+                    raise ValueError(f"No conversation with role='user' found: {data}")
                 instructions.append("\n".join(user_messages))
                 commits.append(data["commit"])
 
-            # 通用格式处理
-            # 检查 field_name 字段
+            # General format processing
+            # Check field_name
             elif len(field_name) == 2:
                 if field_name[0] not in data or field_name[1] not in data:
-                    raise KeyError(f"字段 {field_name} 中的某个字段不存在于数据: {data}")
+                    raise KeyError(f"One of the fields in {field_name} does not exist in data: {data}")
                 instructions.append(f"## Code Before:\n{data[field_name[0]]}\n## Instruction:\n{data[field_name[1]]}\n## Code After:\n")
                 commits.append(data["commit"])
             elif field_name[0] in data:
                 instructions.append(data[field_name[0]])
                 commits.append(data["commit"])
             else:
-                raise KeyError(f"字段 {field_name[0]} 不存在于数据: {data}")
+                raise KeyError(f"Field {field_name[0]} does not exist in data: {data}")
     return instructions, commits

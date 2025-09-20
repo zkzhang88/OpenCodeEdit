@@ -92,13 +92,13 @@ def hdp_topic_analysis(jsonl_path, field_name, data_format, refit=False, debug=F
     import joblib
     import os
 
-    # 下载NLTK的停用词表
+    # Download NLTK stopwords
     nltk.download('punkt')
     nltk.download('stopwords')
 
     code_stop_words = CODE_STOP_WORDS
 
-    # 获取模型保存路径
+    # Get model save path
     base_name = os.path.splitext(os.path.basename(jsonl_path))[0]
     fit_dir = os.path.join(os.path.dirname(__file__), "fit_results")
     os.makedirs(fit_dir, exist_ok=True)
@@ -106,10 +106,10 @@ def hdp_topic_analysis(jsonl_path, field_name, data_format, refit=False, debug=F
     hdp_dict_path = os.path.join(fit_dir, f"{base_name}_hdp_dictionary.joblib")
     processed_docs_path = os.path.join(fit_dir, f"{base_name}_hdp_processed_docs.joblib")
 
-    # 加载数据
+    # Load data
     instr_list, _ = load_instructions_from_jsonl(jsonl_path, field_name, data_format)
 
-    # 文本预处理函数
+    # Text preprocessing function
     def preprocess(text):
         stop_words = set(stopwords.words('english'))
         code_tokens, word_tokens = edit_instruction_splitter(text)
@@ -122,10 +122,10 @@ def hdp_topic_analysis(jsonl_path, field_name, data_format, refit=False, debug=F
         #     log.info(f"Processed word tokens: {word_tokens}")
         return code_tokens + word_tokens
 
-    # 如果模型已存在且不要求重新训练，直接加载
+    # If model exists and refit is not required, load directly
     if os.path.exists(hdp_model_path) and os.path.exists(hdp_dict_path) \
-    and os.path.exists(processed_docs_path) and not refit:
-        log.info(f"加载已存在的 HDP 模型: {hdp_model_path}")
+            and os.path.exists(processed_docs_path) and not refit:
+        log.info(f"Loaded existing HDP model: {hdp_model_path}")
         hdp_model = joblib.load(hdp_model_path)
         dictionary = joblib.load(hdp_dict_path)
         processed_docs = joblib.load(processed_docs_path)
@@ -134,16 +134,16 @@ def hdp_topic_analysis(jsonl_path, field_name, data_format, refit=False, debug=F
         processed_docs = [preprocess(doc) for doc in tqdm(instr_list, desc="Preprocessing instructions for HDP")]
         dictionary = corpora.Dictionary(processed_docs)
         corpus = [dictionary.doc2bow(doc) for doc in tqdm(processed_docs, desc="Building HDP corpus")]
-        log.info("正在进行 HDP 主题分析...")
+        log.info("Performing HDP topic analysis...")
         hdp_model = HdpModel(corpus=corpus, id2word=dictionary, random_state=random_seed)
         joblib.dump(hdp_model, hdp_model_path)
         joblib.dump(dictionary, hdp_dict_path)
         joblib.dump(processed_docs, processed_docs_path)
-        log.info(f"HDP模型已保存到: {hdp_model_path}")
-        log.info(f"HDP字典已保存到: {hdp_dict_path}")
-        log.info(f"Processed docs 已保存到: {processed_docs_path}")
+        log.info(f"HDP model saved to: {hdp_model_path}")
+        log.info(f"HDP dictionary saved to: {hdp_dict_path}")
+        log.info(f"Processed docs saved to: {processed_docs_path}")
 
-    # 统计硬分布：每个文档的主主题
+    # Count hard distribution: dominant topic for each document
     dominant_topics = [max(hdp_model[bow], key=lambda x: x[1])[0] 
                        for bow in tqdm(corpus, desc="Assigning dominant topics (HDP)")]
     topic_counts = Counter(dominant_topics)
@@ -151,11 +151,11 @@ def hdp_topic_analysis(jsonl_path, field_name, data_format, refit=False, debug=F
     topic_ids = [tid for tid, _ in top_topics]
 
     num_topics = len(topic_counts)
-    # 获取这些主题的描述
+    # Get descriptions for these topics
     topic_dict = dict(hdp_model.print_topics(num_topics=num_topics, num_words=10))
     # top_20 = {tid: topic_dict[tid] for tid in topic_ids}
 
-    # 绘制主题分布柱状图（最多20个，按数量降序）
+    # Plot topic distribution bar chart (up to 20, sorted by count)
     figure_dir = kwargs.get('figure_dir', None)
     if figure_dir:
         counts = [count for _, count in top_topics]
@@ -183,18 +183,18 @@ def hdp_topic_analysis(jsonl_path, field_name, data_format, refit=False, debug=F
 def filter_data_by_hdp_topic_analysis(jsonl_path, field_name, data_format, max_samples_per_topic=None, max_samples_total=None,
                                       refit=False, debug=False, random_seed=None, output_path=None):
     """
-    对数据进行HDP主题分析，然后对每个主题超过max_samples_per_topic条数据的主题进行随机采样
+    Perform HDP topic analysis on data, then randomly sample topics with more than max_samples_per_topic samples.
     Args:
-        jsonl_path (str): 输入JSONL文件路径
-        field_name (str): 要提取的字段名
-        data_format (str): 数据格式类型
-        max_samples_per_topic (int): 每个主题最大保留的样本数
-        refit (bool): 是否重新训练模型
-        debug (bool): 是否启用调试模式
-        random_seed (int): 随机种子
-        output_path (str): 输出文件路径，如果为None则自动生成
+        jsonl_path (str): Input JSONL file path
+        field_name (str): Field name to extract
+        data_format (str): Data format type
+        max_samples_per_topic (int): Maximum samples to keep per topic
+        refit (bool): Whether to retrain model
+        debug (bool): Enable debug mode
+        random_seed (int): Random seed
+        output_path (str): Output file path, auto-generated if None
     Returns:
-        str: 输出文件路径
+        str: Output file path
     """
     import random
     import nltk
@@ -203,20 +203,20 @@ def filter_data_by_hdp_topic_analysis(jsonl_path, field_name, data_format, max_s
     from nltk.corpus import stopwords
     import joblib
     
-    # 设置随机种子
+    # Set random seed
     if random_seed is not None:
         random.seed(random_seed)
         np.random.seed(random_seed)
 
     if max_samples_total is not None:
-        log.info(f"已设置总样本数: {max_samples_total}")
+        log.info(f"Total sample count set: {max_samples_total}")
     elif max_samples_per_topic is not None:
-        log.info(f"已设置每个主题最大样本数: {max_samples_per_topic}")
+        log.info(f"Max samples per topic set: {max_samples_per_topic}")
     else:
-        log.info("未设置最大样本数限制")
-        raise ValueError("至少需要设置 max_samples_per_topic 或 max_samples_total")
+        log.info("No max sample count set")
+        raise ValueError("At least one of max_samples_per_topic or max_samples_total must be set")
 
-    # 下载NLTK的停用词表
+    # Download NLTK stopwords
     nltk.download('punkt', quiet=True)
     nltk.download('stopwords', quiet=True)
     
@@ -230,10 +230,10 @@ def filter_data_by_hdp_topic_analysis(jsonl_path, field_name, data_format, max_s
     hdp_dict_path = os.path.join(fit_dir, f"{base_name}_hdp_dictionary.joblib")
     processed_docs_path = os.path.join(fit_dir, f"{base_name}_hdp_processed_docs.joblib")
     
-    # 加载原始数据
+    # Load original data
     instr_list, _ = load_instructions_from_jsonl(jsonl_path, field_name, data_format)
     
-    # 同时读取完整的JSONL数据以便后续筛选
+    # Also read full JSONL data for later filtering
     original_data = []
     with open(jsonl_path, 'r', encoding='utf-8') as f:
         for line in f:
@@ -241,9 +241,9 @@ def filter_data_by_hdp_topic_analysis(jsonl_path, field_name, data_format, max_s
             if line:
                 original_data.append(json.loads(line))
     
-    log.info(f"原始数据总数: {len(original_data)}")
+    log.info(f"Total original data count: {len(original_data)}")
     
-    # 文本预处理函数
+    # Text preprocessing function
     def preprocess(text):
         stop_words = set(stopwords.words('english'))
         code_tokens, word_tokens = edit_instruction_splitter(text)
@@ -253,28 +253,28 @@ def filter_data_by_hdp_topic_analysis(jsonl_path, field_name, data_format, max_s
         code_tokens = [t for t in code_tokens if t not in code_stop_words]
         return code_tokens + word_tokens
     
-    # 如果模型已存在且不要求重新训练，直接加载
+    # If model exists and refit is not required, load directly
     if os.path.exists(hdp_model_path) and os.path.exists(hdp_dict_path) \
-    and os.path.exists(processed_docs_path) and not refit:
-        log.info(f"加载已存在的 HDP 模型: {hdp_model_path}")
+            and os.path.exists(processed_docs_path) and not refit:
+        log.info(f"Loaded existing HDP model: {hdp_model_path}")
         hdp_model = joblib.load(hdp_model_path)
         dictionary = joblib.load(hdp_dict_path)
         processed_docs = joblib.load(processed_docs_path)
         corpus = [dictionary.doc2bow(doc) for doc in tqdm(processed_docs, desc="Building HDP corpus")]
     else:
-        log.info("开始预处理文档...")
+        log.info("Start preprocessing documents...")
         processed_docs = [preprocess(doc) for doc in tqdm(instr_list, desc="Preprocessing instructions for HDP")]
         dictionary = corpora.Dictionary(processed_docs)
         corpus = [dictionary.doc2bow(doc) for doc in tqdm(processed_docs, desc="Building HDP corpus")]
-        log.info("正在进行 HDP 主题分析...")
+        log.info("Performing HDP topic analysis...")
         hdp_model = HdpModel(corpus=corpus, id2word=dictionary, random_state=random_seed)
         joblib.dump(hdp_model, hdp_model_path)
         joblib.dump(dictionary, hdp_dict_path)
         joblib.dump(processed_docs, processed_docs_path)
-        log.info(f"HDP模型已保存到: {hdp_model_path}")
+    log.info(f"HDP model saved to: {hdp_model_path}")
     
-    # 为每个文档分配主导主题
-    log.info("为每个文档分配主导主题...")
+    # Assign dominant topic for each document
+    log.info("Assigning dominant topic for each document...")
     dominant_topics = []
     for bow in tqdm(corpus, desc="Assigning dominant topics"):
         topic_probs = hdp_model[bow]
@@ -282,13 +282,13 @@ def filter_data_by_hdp_topic_analysis(jsonl_path, field_name, data_format, max_s
             dominant_topic = max(topic_probs, key=lambda x: x[1])[0]
             dominant_topics.append(dominant_topic)
         else:
-            dominant_topics.append(-1)  # 无主题分配
+            dominant_topics.append(-1)  # No topic assigned
     
-    # 统计每个主题的文档数量
+    # Count document number for each topic
     topic_counts = Counter(dominant_topics)
-    log.info(f"发现 {len(topic_counts)} 个主题")
+    log.info(f"Found {len(topic_counts)} topics")
     
-    # 创建主题到文档索引的映射
+    # Create mapping from topic to document indices
     topic_to_indices = {}
     for idx, topic_id in enumerate(dominant_topics):
         topic_to_indices.setdefault(topic_id, []).append(idx)
@@ -296,16 +296,16 @@ def filter_data_by_hdp_topic_analysis(jsonl_path, field_name, data_format, max_s
     if max_samples_total:
         sorted_topic_counts = sorted(topic_counts.items(), key=lambda x: x[1], reverse=True)
 
-    # 根据 max_samples_total 计算每个主题的目标保留数
+    # Calculate target number to keep for each topic according to max_samples_total
     if max_samples_total is not None:
         total = sum(len(v) for v in topic_to_indices.values())
-        log.info(f"原始总样本数: {total}, 目标总数: {max_samples_total}")
+        log.info(f"Original total sample count: {total}, target total: {max_samples_total}")
 
         locked = {}
         unlocked = dict(topic_to_indices)
 
         while True:
-            log.info(f"当前锁定的主题数: {len(locked)}, 未锁定的主题数: {len(unlocked)}")
+            log.info(f"Current locked topics: {len(locked)}, unlocked topics: {len(unlocked)}")
             n_unlocked = len(unlocked)
             if n_unlocked == 0:
                 break
@@ -313,7 +313,7 @@ def filter_data_by_hdp_topic_analysis(jsonl_path, field_name, data_format, max_s
 
             changed = False
             for topic, indices in list(unlocked.items()):
-                log.info(f"主题 {topic}: 当前样本数 {len(indices)}, 目标样本数 {target_per_topic}")
+                log.info(f"Topic {topic}: current sample count {len(indices)}, target sample count {target_per_topic}")
                 if len(indices) <= target_per_topic:
                     locked[topic] = indices
                     del unlocked[topic]
@@ -348,7 +348,7 @@ def filter_data_by_hdp_topic_analysis(jsonl_path, field_name, data_format, max_s
         else:
             sampled_indices = indices
         filtered_indices.extend(sampled_indices)
-        log.info(f"主题 {topic_id}: {len(indices)} 条 → 保留 {target_n} 条")
+    log.info(f"Topic {topic_id}: {len(indices)} → keep {target_n}")
     
     filtered_data = [original_data[idx] for idx in sorted(filtered_indices)]
     
@@ -366,7 +366,7 @@ def filter_data_by_hdp_topic_analysis(jsonl_path, field_name, data_format, max_s
         for item in filtered_data:
             f.write(json.dumps(item, ensure_ascii=False) + '\n')
     
-    log.info(f"筛选后的数据已保存到: {output_path}")
+    log.info(f"Filtered data saved to: {output_path}")
 
 
 def diff_analysis(old_code, new_code, context=3):
@@ -384,14 +384,14 @@ def diff_analysis(old_code, new_code, context=3):
         elif tag == 'delete':
             removed += (i2 - i1)
 
-    # 计算 hunk 数量
+    # Calculate hunk number
     hunks = []
     current_hunk = []
     for tag, i1, i2, j1, j2 in opcodes:
         if tag == 'equal':
             equal_len = i2 - i1
             if equal_len > 2 * context:
-                # 长度超过 2 * context，需分割 hunk
+                # If length exceeds 2 * context, split hunk
                 if current_hunk:
                     hunks.append(current_hunk)
                     current_hunk = []
@@ -444,7 +444,7 @@ def compute_diff_statistics(jsonl_path, figure_dir="statistic_figure", **kwargs)
     """
     
 
-    # 读取 jsonl 文件
+    # Read jsonl file
     diff_stats_list = []
     modified_list = []
     hunk_num_list = []
@@ -461,7 +461,7 @@ def compute_diff_statistics(jsonl_path, figure_dir="statistic_figure", **kwargs)
             hunk_num_list.append(diff_stats["hunk_num"])
             hunk_num_list_1.append(diff_stats["diff_hunk_num"])
 
-    # 计算统计量
+    # Calculate statistics
     def get_stats(arr):
         arr_np = np.array(arr)
         return arr_np.min(), arr_np.max(), np.median(arr_np)
@@ -471,7 +471,7 @@ def compute_diff_statistics(jsonl_path, figure_dir="statistic_figure", **kwargs)
     print(f"[Modified Lines] min: {min_mod}, max: {max_mod}, median: {median_mod}")
     print(f"[Hunk Number] min: {min_hunk}, max: {max_hunk}, median: {median_hunk}")
 
-    # 计算比例：modified lines > 70 与 hunks > 7
+    # Calculate ratio: modified lines > 70 and hunks > 7
     total = len(modified_list)
     if total > 0:
         mod_gt70_count = sum(1 for m in modified_list if m > 70)
@@ -485,14 +485,14 @@ def compute_diff_statistics(jsonl_path, figure_dir="statistic_figure", **kwargs)
     print(f"[Modified Lines > 70] ratio: {mod_gt70_ratio:.2%} ({mod_gt70_count}/{total})")
     print(f"[Hunks > 7] ratio: {hunk_gt7_ratio:.2%} ({hunk_gt7_count}/{total})")
 
-    # 绘制分布图
+    # Plot distribution
     fig_dir = figure_dir
     bin_width_modified = kwargs.get('bin_width_modified', 5)
     bin_width_hunk = kwargs.get('bin_width_hunk', 1)
     os.makedirs(fig_dir, exist_ok=True)
     base_name = os.path.splitext(os.path.basename(jsonl_path))[0]
 
-    # 修改行数分布
+    # Modified lines distribution
     plt.figure(figsize=(8, 5))
     modified_bins = np.arange(0, max(modified_list) + bin_width_modified, bin_width_modified)
     plt.hist(modified_list, bins=modified_bins, color="skyblue", edgecolor="black", linewidth=0.3)
@@ -504,7 +504,7 @@ def compute_diff_statistics(jsonl_path, figure_dir="statistic_figure", **kwargs)
     plt.savefig(os.path.join(fig_dir, f"{base_name}_modified_lines_hist.pdf"))
     plt.close()
 
-    # hunk 数量分布
+    # Hunk number distribution
     plt.figure(figsize=(8, 5))
     hunk_bins = np.arange(0, max(hunk_num_list) + bin_width_hunk, bin_width_hunk)
     plt.hist(hunk_num_list, bins=hunk_bins, color="salmon", edgecolor="black", linewidth=0.3)
@@ -547,42 +547,42 @@ def plot_verb_object_sunburst(
     border_width: float = 0.5,
     border_color: str = "white",
 ):
-    # 1. 加载 NLP 模型
+    # 1. Load NLP model
     try:
         nlp = spacy.load(lang)
     except OSError:
-        raise ValueError(f"spaCy model '{lang}' not found. 请先运行: python -m spacy download {lang}")
+        raise ValueError(f"spaCy model '{lang}' not found. Please run: python -m spacy download {lang}")
     
-    # 2. 读取 jsonl 数据
+    # 2. Read jsonl data
     instructions, _ = load_instructions_from_jsonl(jsonl_path, field_name, data_format)
 
-    # 3. 提取动词-宾语对
+    # 3. Extract verb-object pairs
     pairs = []
     for instr in tqdm(instructions, desc="Extracting verb-object pairs"):
-        instr_text = edit_instruction_splitter(instr, tokenize=False)[1]  # 只处理自然语言部分
+        instr_text = edit_instruction_splitter(instr, tokenize=False)[1]  # Only process natural language part
         doc = nlp(instr_text)
         for token in doc:
             if token.pos_ == "VERB":
                 for child in token.children:
-                    if child.dep_ in ("dobj", "obj"):  # 直接宾语
+                    if child.dep_ in ("dobj", "obj"):  # Direct object
                         verb = token.lemma_.lower()
                         obj = child.lemma_.lower()
                         pairs.append((verb, obj))
 
-    # 4. 统计频率
+    # 4. Count frequency
     pair_counts = Counter(pairs)
     data = [{"verb": v, "object": o, "count": c} for (v, o), c in pair_counts.items()]
     if not data:
-        raise ValueError("没有抽取到任何动词-宾语组合，请检查数据或语言模型。")
+        raise ValueError("No verb-object pairs extracted, please check data or language model.")
 
     df_counts = pd.DataFrame(data)
 
-    # 5. 选取前 top_n_verbs 动词
+    # 5. Select top_n_verbs verbs
     verb_freq = df_counts.groupby("verb")["count"].sum().sort_values(ascending=False)
     top_verbs = verb_freq.head(top_n_verbs).index.tolist()
     df_top = df_counts[df_counts["verb"].isin(top_verbs)].copy()
 
-    # 6. 对每个动词选取前 top_n_objects_per_verb 宾语
+    # 6. For each verb, select top_n_objects_per_verb objects
     filtered_rows = []
     for verb in top_verbs:
         sub = df_top[df_top["verb"] == verb].sort_values("count", ascending=False)
@@ -598,7 +598,7 @@ def plot_verb_object_sunburst(
                 }))
     df_final = pd.concat(filtered_rows, ignore_index=True)
 
-    # 7. 绘制 sunburst plot 并保存图片
+    # 7. Plot sunburst and save image
     fig = px.sunburst(
         df_final,
         path=["verb", "object"],

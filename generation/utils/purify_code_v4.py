@@ -50,7 +50,7 @@ def purify_code_from_jsonl(input_file, output_file, purify_field="code_after", p
                         lang = selected.group('lang') or ''
                         code = selected.group('code').strip()
 
-                        # 如果提取的 code 内容为空，抛出异常
+                        # If the extracted 'code' content is empty, raise an exception
                         if not code:
                             raise ValueError('Extracted code block is empty')
                         
