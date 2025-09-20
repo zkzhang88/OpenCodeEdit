@@ -1,6 +1,24 @@
 import json
 
 def separate_instruct(input_file, output_file, check_missing=False):
+    """
+    Separates instruct sections from JSONL input file and writes structured output to another file.
+    This function reads each line from the specified input JSONL file, expecting each line to be a JSON object
+    containing responses with specific instruct markers. It extracts the following sections from the responses:
+    - Old code (before edit)
+    - Descriptive instruct
+    - Lazy instruct
+    - New code (after edit)
+    If any instruct markers are missing or extracted contents are empty, the function logs the issue and optionally
+    writes the problematic data to 'missing_instructs.jsonl' (when check_missing is True).
+
+    Args:
+        input_file (str): Path to the input JSONL file containing the instruct data.
+        output_file (str): Path to the output JSONL file where separated instructs will be written.
+        check_missing (bool, optional): If True, writes entries with missing instructs to 'missing_instructs.jsonl'.
+                                        Defaults to False.
+    """
+
     count_missing = 0
     with open(input_file, 'r', encoding='utf-8') as infile, open(output_file, 'w', encoding='utf-8') as outfile:
         for line in infile:
