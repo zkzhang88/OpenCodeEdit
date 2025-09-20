@@ -3,11 +3,8 @@
 import os
 import json
 import matplotlib.pyplot as plt
-from sklearn.decomposition import PCA
-from sklearn.manifold import TSNE
 import logging
 import numpy as np
-import math
 from collections import Counter
 import argparse
 from tqdm import tqdm
