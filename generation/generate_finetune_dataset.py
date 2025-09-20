@@ -9,6 +9,19 @@ SYSTEM_PROMPT = "You are a code editor. You will be provided the original code s
 
 
 def generate_prompt(input_files, output_file, prompt_format='share_gpt', random_seed=None):
+    """
+    Generates prompts for finetuning datasets from input files and writes them to an output file in JSONL format.
+    Args:
+        input_files (str): Path to the input file containing data to be processed.
+        output_file (str): Path to the output file where the constructed prompts will be saved.
+        prompt_format (str, optional): Format of the prompt to be constructed. Defaults to 'share_gpt'.
+        random_seed (int, optional): Random seed for reproducibility. If provided, sets the seed for random operations.
+
+    Returns:
+        None
+
+    """
+    
 
     if random_seed is not None:
         random.seed(random_seed)  # Set the random seed for reproducibility
