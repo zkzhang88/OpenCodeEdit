@@ -16,7 +16,6 @@ pandas==2.2.3
 plotly==6.3.0
 Pygments==2.19.2
 PyYAML==6.0.2
-scikit_learn==1.6.1
 spacy==3.8.7
 tqdm==4.67.1
 ```
