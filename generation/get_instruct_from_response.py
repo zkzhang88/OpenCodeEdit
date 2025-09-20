@@ -19,7 +19,21 @@ def filter_singleline_data(input_file, output_file, field_names):
             if not delete_flag:
                 outfile.write(json.dumps(data) + '\n')
 
-def purify_instruct_and_code(input_file, output_file):
+def extract_instruct(input_file, output_file):
+    """
+    Processes a model response file to extract, filter, and purify instructions and code, saving the final result to an output file.
+    The function performs the following steps:
+    1. Separates instructions and code from the input file (model response).
+    2. Filters out entries with single-line code in specified fields.
+    3. Purifies code segments by removing unwanted marks.
+    4. Purifies instruction segments by removing unwanted marks.
+    5. Writes the processed data to the specified output file.
+    6. Cleans up temporary files created during processing.
+    Args:
+        input_file (str): Path to the input file containing model responses.
+        output_file (str): Path to the output file where purified instructions and code will be saved.
+    """
+
     base_name = 'purify_temp'
     extension = '.jsonl'
     counter = 0
@@ -72,4 +86,4 @@ if __name__ == '__main__':
     parser.add_argument("output_file", help="Path to the output JSONL file")
     args = parser.parse_args()
 
-    purify_instruct_and_code(args.input_file, args.output_file)
+    extract_instruct(args.input_file, args.output_file)
