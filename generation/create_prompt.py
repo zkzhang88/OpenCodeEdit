@@ -14,7 +14,7 @@ def create_prompt(commit_input_path, oneshot_input_path, prompt_version, prompt_
     Args:
         commit_input_path (str): Path to the JSONL file, each line representing a commit with keys 'commit', 'old_contents', 'new_contents', and 'message'.
         oneshot_input_path (str): Path to the one-shot input file containing example data.
-        prompt_version (str): Version of the prompt template to use. Supported versions are 'v1', 'v2', and 'v3'.
+        prompt_version (str): Version of the prompt template to use. 
         prompt_output_path (str): Path to the output JSONL file where the filled prompts will be written.
         sample_num (int, optional): Number of samples to generate in total. Defaults to 1.
         random_seed (int, optional): Seed for random number generator to ensure reproducibility. Defaults to None.
