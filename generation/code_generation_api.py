@@ -1,10 +1,8 @@
-import os
 import json
 from openai import OpenAI
 import random
 import datetime
 import argparse
-import subprocess
 import time
 
 
